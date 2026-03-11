@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cadastro — Mini Loja</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+<div class="auth-page">
+    <div class="auth-card">
+        <a href="/" class="brand">Mini Loja</a>
+        <h1>Criar conta</h1>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flash-list">
+              {% for msg in messages %}<li class="error">{{ msg }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/cadastro" novalidate>
+            <div class="field">
+                <label for="nome">Nome completo</label>
+                <input id="nome" type="text" name="nome" placeholder="Seu nome"
+                       required maxlength="50" autocomplete="name">
+            </div>
+            <div class="field">
+                <label for="email">E-mail</label>
+                <input id="email" type="email" name="email" placeholder="voce@email.com"
+                       required maxlength="254" autocomplete="email">
+            </div>
+            <div class="field">
+                <label for="senha">Senha</label>
+                <input id="senha" type="password" name="senha" placeholder="Mínimo 8 caracteres"
+                       required minlength="8" maxlength="254" autocomplete="new-password">
+            </div>
+            <div class="field">
+                <label for="confirmar">Confirmar senha</label>
+                <input id="confirmar" type="password" name="confirmar" placeholder="Repita a senha"
+                       required minlength="8" maxlength="254" autocomplete="new-password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;margin-top:4px;">
+                Criar conta
+            </button>
+        </form>
+        <p class="footer-link">Já tem conta? <a href="/login">Entrar</a></p>
+    </div>
+</div>
+</body>
+</html>

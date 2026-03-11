@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard — Mini Loja</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .page { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+        .page-header {
+            display: flex; align-items: center;
+            justify-content: space-between; margin-bottom: 24px;
+        }
+        .page-header h1 { font-family: var(--font-display); font-size: 22px; font-weight: 700; }
+        .page-header p { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+
+        .table-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: var(--surface-2); border-bottom: 1px solid var(--border); }
+        th {
+            padding: 11px 16px; font-size: 11px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.6px;
+            color: var(--text-muted); text-align: left;
+        }
+        td {
+            padding: 14px 16px; font-size: 14px;
+            border-bottom: 1px solid var(--border); vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: var(--surface-2); }
+
+        .prod-cell { display: flex; align-items: center; gap: 12px; }
+        .prod-thumb {
+            width: 46px; height: 46px;
+            object-fit: contain; border-radius: var(--radius-sm);
+            background: var(--surface-2); border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .prod-name { font-weight: 500; }
+        .prod-desc { font-size: 12px; color: var(--text-light); margin-top: 2px;
+                     max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .price { font-weight: 700; }
+
+        .badge {
+            display: inline-flex; align-items: center;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: 500; gap: 4px;
+        }
+        .badge-ok   { background: var(--success-bg); color: var(--success); }
+        .badge-warn { background: var(--warn-bg);    color: var(--warn); }
+        .badge-err  { background: var(--danger-bg);  color: var(--danger); }
+
+        .row-actions { display: flex; gap: 6px; }
+        .act-edit { background: var(--accent-light); color: var(--accent); font-size: 13px; }
+        .act-edit:hover { background: #dbeafe; }
+        .act-del  { font-size: 13px; }
+
+        .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .empty-icon { font-size: 38px; margin-bottom: 10px; }
+        .empty h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+
+        @media (max-width: 700px) {
+            .hide-sm { display: none; }
+            .page { padding: 20px 12px; }
+            .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">Mini Loja</a>
+    <div class="nav-actions">
+        <a href="/" class="btn btn-ghost">← Loja</a>
+        <a href="/logout" class="btn btn-danger">Logout</a>
+    </div>
+</header>
+
+<div class="page">
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flash-list">
+          {% for msg in messages %}<li class="info">{{ msg }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <div class="page-header">
+        <div>
+            <h1>Olá, {{ usuario_nome }} 👋</h1>
+            <p>Gerencie seus produtos abaixo</p>
+        </div>
+        <a href="/produto/adicionar" class="btn btn-primary">+ Adicionar produto</a>
+    </div>
+
+    <div class="table-card">
+        {% if produtos %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th class="hide-sm">Preço</th>
+                    <th class="hide-sm">Estoque</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in produtos %}
+                <tr>
+                    <td>
+                        <div class="prod-cell">
+                            {% if p.imagem %}
+                            <img class="prod-thumb"
+                                 src="{{ url_for('static', filename='images/' + p.imagem) }}"
+                                 alt="{{ p.nome }}">
+                            {% endif %}
+                            <div>
+                                <div class="prod-name">{{ p.nome }}</div>
+                                {% if p.descricao %}
+                                <div class="prod-desc">{{ p.descricao }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="hide-sm">
+                        <span class="price">R$ {{ "{:,.2f}".format(p.preco) }}</span>
+                    </td>
+                    <td class="hide-sm">
+                        {% if p.estoque == 0 %}
+                            <span class="badge badge-err">Esgotado</span>
+                        {% elif p.estoque <= 5 %}
+                            <span class="badge badge-warn">{{ p.estoque }} un.</span>
+                        {% else %}
+                            <span class="badge badge-ok">{{ p.estoque }} un.</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="row-actions">
+                            <a href="/produto/editar/{{ p.id }}" class="btn act-edit">Editar</a>
+                            <a href="/produto/deletar/{{ p.id }}" class="btn btn-danger act-del">Deletar</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty">
+            <div class="empty-icon">📦</div>
+            <h3>Nenhum produto cadastrado</h3>
+            <p>Clique em "Adicionar produto" para começar.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

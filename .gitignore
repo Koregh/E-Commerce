@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.db
+.pytest_cache/
+static/images/*.png
+static/images/*.jpg
+static/images/*.jpeg
+static/images/*.webp

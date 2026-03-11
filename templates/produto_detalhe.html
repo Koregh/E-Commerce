@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>{{ produto.nome }} - Mini Loja</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+:root{
+--bg:#f5f5f5;
+--white:#fff;
+--text:#1a1a1a;
+--muted:#777;
+--accent:#3483fa;
+--accent-hover:#2968c8;
+--buy:#00a650;
+--buy-hover:#008f45;
+--border:#e6e6e6;
+--radius:8px;
+--shadow:0 1px 3px rgba(0,0,0,0.08);
+}
+
+body{
+font-family:'DM Sans',sans-serif;
+background:var(--bg);
+color:var(--text);
+}
+
+.navbar{
+background:var(--white);
+border-bottom:1px solid var(--border);
+height:56px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 32px;
+}
+
+.logo{
+font-size:20px;
+font-weight:700;
+color:var(--accent);
+text-decoration:none;
+}
+
+.nav-btn{
+font-size:14px;
+padding:7px 16px;
+border-radius:6px;
+text-decoration:none;
+color:var(--text);
+border:1px solid var(--border);
+}
+
+.page{
+max-width:1100px;
+margin:40px auto;
+padding:0 20px;
+}
+
+.layout{
+display:grid;
+grid-template-columns:1fr 340px;
+gap:28px;
+}
+
+.produto-box{
+background:var(--white);
+border-radius:var(--radius);
+box-shadow:var(--shadow);
+padding:32px;
+}
+
+.produto-img{
+width:100%;
+height:420px;
+object-fit:contain;
+background:#fafafa;
+border-radius:6px;
+border:1px solid var(--border);
+margin-bottom:24px;
+}
+
+.produto-title{
+font-size:26px;
+font-weight:600;
+margin-bottom:12px;
+}
+
+.produto-desc{
+color:var(--muted);
+line-height:1.6;
+font-size:15px;
+}
+
+.compra-box{
+background:var(--white);
+border-radius:var(--radius);
+box-shadow:var(--shadow);
+padding:24px;
+height:fit-content;
+}
+
+.preco{
+font-size:30px;
+font-weight:700;
+margin-bottom:10px;
+}
+
+.estoque{
+font-size:14px;
+color:var(--muted);
+margin-bottom:20px;
+}
+
+.qtd{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:20px;
+}
+
+.qtd button{
+width:32px;
+height:32px;
+border:1px solid var(--border);
+background:#fff;
+font-size:18px;
+cursor:pointer;
+border-radius:4px;
+}
+
+.qtd input{
+width:50px;
+text-align:center;
+border:1px solid var(--border);
+border-radius:4px;
+padding:6px;
+}
+
+.btn{
+width:100%;
+padding:12px;
+border:none;
+border-radius:6px;
+font-size:15px;
+font-weight:600;
+cursor:pointer;
+margin-bottom:10px;
+}
+
+.btn-buy{
+background:var(--buy);
+color:#fff;
+}
+
+.btn-buy:hover{
+background:var(--buy-hover);
+}
+
+.btn-cart{
+background:var(--accent);
+color:#fff;
+}
+
+.btn-cart:hover{
+background:var(--accent-hover);
+}
+
+@media(max-width:900px){
+.layout{
+grid-template-columns:1fr;
+}
+}
+</style>
+</head>
+
+<body>
+
+<header class="navbar">
+<a href="/" class="logo">Mini Loja</a>
+<a href="/" class="nav-btn">← Voltar</a>
+</header>
+
+<div class="page">
+
+<div class="layout">
+
+<div class="produto-box">
+
+{% if produto.imagem %}
+<img class="produto-img" src="{{ url_for('static', filename='images/' + produto.imagem) }}">
+{% endif %}
+
+<h1 class="produto-title">{{ produto.nome }}</h1>
+
+<p class="produto-desc">
+{{ produto.descricao or "Sem descrição disponível." }}
+</p>
+
+</div>
+
+
+<div class="compra-box">
+
+<div class="preco">
+R$ {{ "%.2f"|format(produto.preco) }}
+</div>
+
+<div class="estoque">
+Estoque disponível: {{ produto.estoque }}
+</div>
+
+<div class="qtd">
+<button onclick="menos()">-</button>
+<input id="quantidade" type="number" value="1" min="1">
+<button onclick="mais()">+</button>
+</div>
+
+<form action="/carrinho/adicionar/{{ produto.id }}" method="POST">
+
+<input type="hidden" name="quantidade" id="qtd-input" value="1">
+
+<button class="btn btn-buy" type="submit">
+Comprar agora
+</button>
+
+<button class="btn btn-cart" type="submit">
+Adicionar ao carrinho
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function mais(){
+let input = document.getElementById("quantidade")
+input.value = parseInt(input.value)+1
+sync()
+}
+
+function menos(){
+let input = document.getElementById("quantidade")
+if(input.value > 1){
+input.value = parseInt(input.value)-1
+}
+sync()
+}
+
+function sync(){
+document.getElementById("qtd-input").value =
+document.getElementById("quantidade").value
+}
+
+</script>
+
+</body>
+</html>

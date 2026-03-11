@@ -1,0 +1,287 @@
+/* ────────────────────────────────────────────
+   Mini Loja — Design System
+   Fonte: Sora (display) + Inter (body)
+   Paleta: branco limpo, cinza neutro, azul ML
+──────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --bg:           #f2f2f2;
+    --surface:      #ffffff;
+    --surface-2:    #fafafa;
+    --text:         #111827;
+    --text-muted:   #6b7280;
+    --text-light:   #9ca3af;
+    --accent:       #2563eb;
+    --accent-light: #eff6ff;
+    --accent-hover: #1d4ed8;
+    --success:      #16a34a;
+    --success-bg:   #f0fdf4;
+    --warn:         #b45309;
+    --warn-bg:      #fffbeb;
+    --danger:       #dc2626;
+    --danger-bg:    #fef2f2;
+    --border:       #e5e7eb;
+    --border-focus: #2563eb;
+    --radius-sm:    6px;
+    --radius:       10px;
+    --radius-lg:    14px;
+    --shadow-sm:    0 1px 3px rgba(0,0,0,0.07);
+    --shadow:       0 2px 8px rgba(0,0,0,0.09);
+    --shadow-lg:    0 8px 24px rgba(0,0,0,0.12);
+    --transition:   0.18s ease;
+    --font-display: 'Sora', sans-serif;
+    --font-body:    'Inter', sans-serif;
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Navbar ─────────────────────────── */
+.navbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    height: 58px;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+}
+
+.logo {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: -0.3px;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-user {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-right: 4px;
+}
+
+/* ── Botões ─────────────────────────── */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background var(--transition), color var(--transition),
+                box-shadow var(--transition), transform var(--transition);
+    white-space: nowrap;
+    line-height: 1;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn-primary   { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-hover); }
+
+.btn-ghost     { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--bg); }
+
+.btn-danger    { background: transparent; color: var(--danger); border: 1px solid #fca5a5; }
+.btn-danger:hover { background: var(--danger-bg); }
+
+.btn-icon      { padding: 8px; border-radius: var(--radius-sm); background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+.btn-icon:hover { background: var(--bg); color: var(--text); }
+
+/* ── Carrinho badge ─────────────────── */
+.cart-btn {
+    position: relative;
+}
+.cart-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    pointer-events: none;
+    transition: transform 0.2s;
+}
+.cart-badge.bump { animation: bump 0.3s ease; }
+@keyframes bump {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
+
+/* ── Flash messages ─────────────────── */
+.flash-list {
+    list-style: none;
+    margin-bottom: 16px;
+}
+.flash-list li {
+    padding: 11px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.flash-list li.success {
+    background: var(--success-bg);
+    color: var(--success);
+    border-left: 3px solid var(--success);
+}
+.flash-list li.error {
+    background: var(--danger-bg);
+    color: var(--danger);
+    border-left: 3px solid var(--danger);
+}
+.flash-list li.info {
+    background: var(--accent-light);
+    color: var(--accent);
+    border-left: 3px solid var(--accent);
+}
+
+/* ── Formulários ────────────────────── */
+.field { margin-bottom: 18px; }
+
+.field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+.field label .req { color: var(--danger); margin-left: 2px; }
+
+.field input,
+.field textarea,
+.field select {
+    width: 100%;
+    padding: 10px 14px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    color: var(--text);
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition),
+                background var(--transition);
+}
+.field input:focus,
+.field textarea:focus {
+    border-color: var(--border-focus);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+.field textarea { resize: vertical; min-height: 88px; }
+
+/* Input delay animation */
+.field input, .field textarea {
+    animation: fadeSlideIn 0.25s ease both;
+}
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.field:nth-child(1) input, .field:nth-child(1) textarea { animation-delay: 0.05s; }
+.field:nth-child(2) input, .field:nth-child(2) textarea { animation-delay: 0.1s; }
+.field:nth-child(3) input, .field:nth-child(3) textarea { animation-delay: 0.15s; }
+.field:nth-child(4) input, .field:nth-child(4) textarea { animation-delay: 0.2s; }
+.field:nth-child(5) input, .field:nth-child(5) textarea { animation-delay: 0.25s; }
+
+/* ── Cards de auth ──────────────────── */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: var(--bg);
+}
+
+.auth-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 420px;
+    animation: cardIn 0.3s ease both;
+}
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.auth-card .brand {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    text-align: center;
+    margin-bottom: 6px;
+    text-decoration: none;
+    display: block;
+}
+
+.auth-card h1 {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+    color: var(--text);
+}
+
+.auth-card .footer-link {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 18px;
+}
+.auth-card .footer-link a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+}
+.auth-card .footer-link a:hover { text-decoration: underline; }
+
+/* ── Responsivo ─────────────────────── */
+@media (max-width: 640px) {
+    .navbar { padding: 0 16px; }
+    .nav-user { display: none; }
+    .auth-card { padding: 28px 20px; }
+}

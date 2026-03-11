@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Verificação — Mini Loja</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .code-input {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 10px;
+            font-family: monospace;
+        }
+        .resend-btn {
+            width: 100%;
+            background: var(--surface-2);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background var(--transition);
+        }
+        .resend-btn:hover { background: var(--bg); }
+        .email-hint { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 20px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+<div class="auth-page">
+    <div class="auth-card">
+        <a href="/" class="brand">Mini Loja</a>
+        <h1>Verificação</h1>
+        <p class="email-hint">
+            Enviamos um código de 6 dígitos para<br>
+            <strong>{{ email }}</strong><br>
+            Válido por 10 minutos.
+        </p>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flash-list">
+              {% for msg in messages %}<li class="info">{{ msg }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/login/verificar" novalidate>
+            <div class="field">
+                <label for="codigo">Código de verificação</label>
+                <input id="codigo" class="code-input" type="text" name="codigo"
+                       placeholder="000000" required minlength="6" maxlength="6"
+                       pattern="\d{6}" inputmode="numeric" autocomplete="one-time-code">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Confirmar</button>
+        </form>
+
+        <form method="POST" action="/login/reenviar">
+            <button type="submit" class="resend-btn">Reenviar código</button>
+        </form>
+
+        <p class="footer-link"><a href="/login">← Voltar ao login</a></p>
+    </div>
+</div>
+</body>
+</html>

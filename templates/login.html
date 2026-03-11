@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entrar — Mini Loja</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+<div class="auth-page">
+    <div class="auth-card">
+        <a href="/" class="brand">Mini Loja</a>
+        <h1>Entrar na conta</h1>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flash-list">
+              {% for msg in messages %}<li class="error">{{ msg }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/login" novalidate>
+            <div class="field">
+                <label for="email">E-mail</label>
+                <input id="email" type="email" name="email" placeholder="voce@email.com"
+                       required maxlength="254" autocomplete="email">
+            </div>
+            <div class="field">
+                <label for="senha">Senha</label>
+                <input id="senha" type="password" name="senha" placeholder="••••••••"
+                       required minlength="8" maxlength="254" autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;margin-top:4px;">
+                Entrar
+            </button>
+        </form>
+        <p class="footer-link">Não tem conta? <a href="/cadastro">Cadastre-se</a></p>
+    </div>
+</div>
+</body>
+</html>

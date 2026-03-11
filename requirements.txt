@@ -1,0 +1,8 @@
+flask>=3.0
+flask-session>=0.8
+redis>=5.0
+bcrypt>=4.1
+better-profanity>=0.7
+werkzeug>=3.0
+pytest>=8.0
+pytest-mock>=3.14

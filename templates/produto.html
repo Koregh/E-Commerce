@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% if produto %}Editar{% else %}Adicionar{% endif %} Produto - Mini Loja</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f0f0f0;
+            --white: #fff;
+            --text: #1a1a1a;
+            --text-muted: #666;
+            --accent: #3483fa;
+            --accent-hover: #2968c8;
+            --border: #e0e0e0;
+            --border-focus: #3483fa;
+            --radius: 8px;
+            --shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .nav-btn {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 7px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+        .nav-btn:hover { background: #f5f5f5; }
+
+        .page {
+            max-width: 560px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .form-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 32px;
+        }
+
+        .form-card h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .flash-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        .flash-list li {
+            background: #ffeaea;
+            border-left: 3px solid #e03131;
+            padding: 10px 14px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #7a1a1a;
+            margin-bottom: 6px;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        label .required {
+            color: #e03131;
+            margin-left: 2px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #fafafa;
+            color: var(--text);
+            transition: border-color 0.15s, box-shadow 0.15s;
+            outline: none;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--border-focus);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(52,131,250,0.12);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        /* Upload */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+            background: #fafafa;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent);
+            background: #f0f6ff;
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .upload-icon { font-size: 28px; margin-bottom: 6px; }
+
+        .upload-text {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .upload-text strong {
+            color: var(--accent);
+        }
+
+        .upload-hint {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 4px;
+        }
+
+        #preview-container {
+            display: none;
+            margin-top: 12px;
+        }
+
+        #preview-img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: #f5f5f5;
+        }
+
+        /* Imagem atual ao editar */
+        .current-img {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .current-img img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: #f5f5f5;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+            margin-top: 8px;
+        }
+        .btn-submit:hover { background: var(--accent-hover); }
+
+        @media (max-width: 500px) {
+            .row { grid-template-columns: 1fr; }
+            .form-card { padding: 24px 16px; }
+            .page { margin: 24px auto; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">Mini Loja</a>
+    <a href="/dashboard" class="nav-btn">← Voltar ao dashboard</a>
+</header>
+
+<div class="page">
+    <div class="form-card">
+        <h1>{% if produto %}Editar produto{% else %}Novo produto{% endif %}</h1>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flash-list">
+              {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <div class="field">
+                <label>Nome do produto <span class="required">*</span></label>
+                <input type="text" name="nome" placeholder="Ex: Tênis Nike Air Max"
+                       required value="{{ produto.nome if produto else '' }}">
+            </div>
+
+            <div class="field">
+                <label>Descrição</label>
+                <textarea name="descricao" placeholder="Descreva o produto brevemente...">{{ produto.descricao if produto and produto.descricao else '' }}</textarea>
+            </div>
+
+            <div class="row">
+                <div class="field">
+                    <label>Preço <span class="required">*</span></label>
+                    <input type="number" step="0.01" name="preco" placeholder="0,00"
+                           required min="0" max="1000000"
+                           value="{{ produto.preco if produto else '' }}">
+                </div>
+                <div class="field">
+                    <label>Estoque <span class="required">*</span></label>
+                    <input type="number" name="estoque" placeholder="0"
+                           required min="0" max="1000000" step="1"
+                           value="{{ produto.estoque if produto else '' }}">
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Imagem {% if not produto %}<span class="required">*</span>{% endif %}</label>
+
+                {% if produto and produto.imagem %}
+                <div class="current-img">
+                    <img src="{{ url_for('static', filename='images/' + produto.imagem) }}" alt="Imagem atual">
+                    <span>Imagem atual — envie uma nova para substituir</span>
+                </div>
+                {% endif %}
+
+                <div class="upload-area" id="upload-area">
+                    <input type="file" name="imagem" accept="image/*"
+                           id="imagem-input" {% if not produto %}required{% endif %}
+                           onchange="previewImagem(this)">
+                    <div class="upload-icon">🖼️</div>
+                    <div class="upload-text"><strong>Clique para escolher</strong> ou arraste aqui</div>
+                    <div class="upload-hint">PNG, JPG, JPEG, WEBP • Máx. 5MB</div>
+                </div>
+
+                <div id="preview-container">
+                    <img id="preview-img" src="" alt="Preview">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                {% if produto %}Salvar alterações{% else %}Adicionar produto{% endif %}
+            </button>
+
+        </form>
+    </div>
+</div>
+
+<script>
+    function previewImagem(input) {
+        const container = document.getElementById('preview-container');
+        const img = document.getElementById('preview-img');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                img.src = e.target.result;
+                container.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+
+</body>
+</html>

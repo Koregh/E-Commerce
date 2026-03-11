@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Carrinho — Mini Loja</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .page { max-width: 840px; margin: 32px auto; padding: 0 24px; }
+        h1 { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin-bottom: 24px; }
+
+        .cart-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .cart-item:last-child { border-bottom: none; }
+
+        .item-img {
+            width: 64px; height: 64px;
+            object-fit: contain; border-radius: var(--radius-sm);
+            background: var(--surface-2); flex-shrink: 0;
+        }
+        .item-placeholder {
+            width: 64px; height: 64px;
+            background: var(--surface-2);
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center;
+            justify-content: center; font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .item-info { flex: 1; min-width: 0; }
+        .item-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+        .item-price { font-size: 13px; color: var(--text-muted); }
+
+        .item-controls {
+            display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+        }
+        .qty-btn {
+            width: 30px; height: 30px;
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            background: var(--surface-2); cursor: pointer;
+            font-size: 16px; font-weight: 600;
+            display: flex; align-items: center; justify-content: center;
+            transition: background var(--transition);
+        }
+        .qty-btn:hover { background: var(--bg); }
+
+        .qty-value {
+            min-width: 28px; text-align: center;
+            font-weight: 600; font-size: 15px;
+        }
+
+        .item-subtotal {
+            min-width: 80px; text-align: right;
+            font-weight: 700; font-size: 15px;
+        }
+
+        .remove-btn {
+            background: none; border: none;
+            color: var(--text-light); cursor: pointer;
+            font-size: 18px; padding: 4px;
+            transition: color var(--transition);
+        }
+        .remove-btn:hover { color: var(--danger); }
+
+        /* Resumo */
+        .summary {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 24px;
+        }
+        .summary-row {
+            display: flex; justify-content: space-between;
+            font-size: 14px; color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .summary-total {
+            display: flex; justify-content: space-between;
+            font-size: 20px; font-weight: 700;
+            color: var(--text); border-top: 1px solid var(--border);
+            padding-top: 12px; margin-top: 4px;
+        }
+
+        .empty { text-align:center; padding: 64px 20px; color: var(--text-muted); }
+        .empty-icon { font-size: 48px; margin-bottom: 12px; }
+        .empty h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+
+        @media (max-width: 600px) {
+            .page { padding: 0 12px; margin-top: 20px; }
+            .item-subtotal { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">Mini Loja</a>
+    <div class="nav-actions">
+        {% if usuario %}
+            <a href="/dashboard" class="btn btn-ghost">Dashboard</a>
+            <a href="/logout" class="btn btn-danger">Logout</a>
+        {% else %}
+            <a href="/login" class="btn btn-ghost">Entrar</a>
+        {% endif %}
+        <a href="/" class="btn btn-ghost">← Continuar comprando</a>
+    </div>
+</header>
+
+<div class="page">
+    <h1>Meu Carrinho</h1>
+
+    {% if carrinho.itens %}
+
+    <div class="cart-card" id="cart-list">
+        {% for item in carrinho.itens %}
+        <div class="cart-item" id="item-{{ item.produto_id }}">
+            {% if item.imagem %}
+                <img class="item-img"
+                     src="{{ url_for('static', filename='images/' + item.imagem) }}"
+                     alt="{{ item.nome }}">
+            {% else %}
+                <div class="item-placeholder">📦</div>
+            {% endif %}
+
+            <div class="item-info">
+                <div class="item-name">{{ item.nome }}</div>
+                <div class="item-price">R$ {{ "{:,.2f}".format(item.preco) }} / un.</div>
+            </div>
+
+            <div class="item-controls">
+                <button class="qty-btn" onclick="changeQty({{ item.produto_id }}, -1)">−</button>
+                <span class="qty-value" id="qty-{{ item.produto_id }}">{{ item.quantidade }}</span>
+                <button class="qty-btn" onclick="changeQty({{ item.produto_id }}, 1)">+</button>
+            </div>
+
+            <div class="item-subtotal" id="sub-{{ item.produto_id }}">
+                R$ {{ "{:,.2f}".format(item.subtotal) }}
+            </div>
+
+            <button class="remove-btn" onclick="removeItem({{ item.produto_id }})" title="Remover">✕</button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="summary">
+        <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="total-value">R$ {{ "{:,.2f}".format(carrinho.total) }}</span>
+        </div>
+        <div class="summary-row">
+            <span>Frete</span>
+            <span>A calcular</span>
+        </div>
+        <div class="summary-total">
+            <span>Total</span>
+            <span id="total-final">R$ {{ "{:,.2f}".format(carrinho.total) }}</span>
+        </div>
+        <button class="btn btn-primary" style="width:100%;margin-top:20px;padding:13px;" disabled>
+            Finalizar compra (em breve)
+        </button>
+    </div>
+
+    {% else %}
+
+    <div class="empty">
+        <div class="empty-icon">🛒</div>
+        <h2>Seu carrinho está vazio</h2>
+        <p>Adicione produtos para começar.</p>
+        <a href="/" class="btn btn-primary" style="margin-top:20px;">Ver produtos</a>
+    </div>
+
+    {% endif %}
+</div>
+
+<script>
+    function fmt(v) {
+        return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    }
+
+    async function removeItem(id) {
+        const row = document.getElementById(`item-${id}`);
+        row.style.opacity = '0.4';
+
+        const res = await fetch(`/carrinho/remover/${id}`, { method: 'POST' });
+        const data = await res.json();
+
+        if (data.ok) {
+            row.remove();
+            document.getElementById('total-value').textContent = fmt(data.total);
+            document.getElementById('total-final').textContent = fmt(data.total);
+            if (data.quantidade_total === 0) location.reload();
+        } else {
+            row.style.opacity = '1';
+        }
+    }
+
+    async function changeQty(id, delta) {
+        const qtyEl = document.getElementById(`qty-${id}`);
+        const current = parseInt(qtyEl.textContent);
+        const nova = current + delta;
+
+        if (nova < 1) {
+    await removeItem(id);
+    return;
+}
+        if (nova > 99) return;
+
+        const res = await fetch(`/carrinho/quantidade/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ quantidade: nova }),
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+         qtyEl.textContent = data.quantidade;
+            document.getElementById(`sub-${id}`).textContent = fmt(data.subtotal);
+            document.getElementById('total-value').textContent = fmt(data.total);
+            document.getElementById('total-final').textContent = fmt(data.total);
+        }
+    }
+</script>
+
+</body>
+</html>

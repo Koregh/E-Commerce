@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% if produto %}Editar{% else %}Novo{% endif %} Produto — Mini Loja</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .page { max-width: 560px; margin: 36px auto; padding: 0 24px; }
+        .form-card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 36px; }
+        .form-card h1 { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .upload-area {
+            border: 2px dashed var(--border); border-radius: var(--radius-sm);
+            padding: 22px; text-align: center; cursor: pointer; position: relative;
+            background: var(--surface-2); transition: border-color var(--transition), background var(--transition);
+        }
+        .upload-area:hover { border-color: var(--accent); background: var(--accent-light); }
+        .upload-area input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .upload-icon { font-size: 26px; margin-bottom: 6px; }
+        .upload-text { font-size: 14px; color: var(--text-muted); }
+        .upload-text strong { color: var(--accent); }
+        .upload-hint { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+        .current-img { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 13px; color: var(--text-muted); }
+        .current-img img { width: 48px; height: 48px; object-fit: contain; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface-2); }
+        #preview-wrap { display: none; margin-top: 10px; }
+        #preview-wrap img { width: 80px; height: 80px; object-fit: contain; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface-2); }
+        .char-count { font-size: 11px; color: var(--text-light); text-align: right; margin-top: 4px; }
+        @media (max-width: 500px) { .row { grid-template-columns: 1fr; } .form-card { padding: 24px 16px; } .page { margin: 20px auto; } }
+    </style>
+</head>
+<body>
+<header class="navbar">
+    <a href="/" class="logo">Mini Loja</a>
+    <a href="/dashboard" class="btn btn-ghost">← Dashboard</a>
+</header>
+
+<div class="page">
+    <div class="form-card">
+        <h1>{% if produto %}Editar produto{% else %}Novo produto{% endif %}</h1>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flash-list">
+              {% for msg in messages %}<li class="error">{{ msg }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" enctype="multipart/form-data" novalidate>
+            <div class="field">
+                <label for="nome">Nome <span class="req">*</span></label>
+                <input id="nome" type="text" name="nome" placeholder="Ex: Camiseta Azul"
+                       required maxlength="120" value="{{ produto.nome if produto else '' }}">
+            </div>
+            <div class="field">
+                <label for="descricao">Descrição <span style="color:var(--text-light);font-weight:400;">(opcional)</span></label>
+                <textarea id="descricao" name="descricao" placeholder="Descreva o produto..." maxlength="500" oninput="updateCount(this)">{{ produto.descricao if produto and produto.descricao else '' }}</textarea>
+                <div class="char-count"><span id="char-n">0</span>/500</div>
+            </div>
+            <div class="row">
+                <div class="field">
+                    <label for="preco">Preço (R$) <span class="req">*</span></label>
+                    <input id="preco" type="number" step="0.01" name="preco" placeholder="0,00"
+                           required min="0" max="1000000" value="{{ produto.preco if produto else '' }}">
+                </div>
+                <div class="field">
+                    <label for="estoque">Estoque <span class="req">*</span></label>
+                    <input id="estoque" type="number" step="1" name="estoque" placeholder="0"
+                           required min="0" max="1000000" value="{{ produto.estoque if produto else '' }}">
+                </div>
+            </div>
+            <div class="field">
+                <label>Imagem {% if not produto %}<span class="req">*</span>{% else %}<span style="color:var(--text-light);font-weight:400;">(deixe vazio para manter)</span>{% endif %}</label>
+                {% if produto and produto.imagem %}
+                <div class="current-img">
+                    <img src="{{ url_for('static', filename='images/' + produto.imagem) }}" alt="Atual">
+                    <span>Imagem atual</span>
+                </div>
+                {% endif %}
+                <div class="upload-area">
+                    <input type="file" name="imagem" accept="image/png,image/jpeg,image/webp"
+                           {% if not produto %}required{% endif %} onchange="preview(this)">
+                    <div class="upload-icon">🖼️</div>
+                    <div class="upload-text"><strong>Clique</strong> ou arraste aqui</div>
+                    <div class="upload-hint">PNG · JPG · WEBP — máx. 5MB</div>
+                </div>
+                <div id="preview-wrap"><img id="preview-img" src="" alt="Preview"></div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;padding:12px;font-size:15px;margin-top:6px;">
+                {% if produto %}Salvar alterações{% else %}Adicionar produto{% endif %}
+            </button>
+        </form>
+        <a href="/dashboard" style="display:block;text-align:center;margin-top:14px;font-size:13px;color:var(--text-muted);text-decoration:none;">Cancelar</a>
+    </div>
+</div>
+<script>
+    function updateCount(el) {
+        document.getElementById('char-n').textContent = el.value.length;
+    }
+    updateCount(document.getElementById('descricao'));
+
+    function preview(input) {
+        if (!input.files[0]) return;
+        const wrap = document.getElementById('preview-wrap');
+        const img  = document.getElementById('preview-img');
+        img.src = URL.createObjectURL(input.files[0]);
+        wrap.style.display = 'block';
+    }
+</script>
+</body>
+</html>
