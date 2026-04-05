@@ -1,6 +1,6 @@
 # Mini Loja - Projeto acadêmico (A3)
 
-**E-commerce com autenticação segura, verificação em duas etapas e arquitetura em camadas.**
+**Desenvolvimento de um sistema de e-commerce com foco em segurança, escalabilidade e organização arquitetural, implementado utilizando abordagem low code, conforme requisitado pelo docente.**
 
 > Este é um projeto simples de estudo e não foi desenvolvido para uso em produção. Alguns aspectos que seriam necessários em um sistema real não estão totalmente implementados.
 
