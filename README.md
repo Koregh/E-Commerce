@@ -1,4 +1,4 @@
-# Mini Loja
+# Mini Loja - Pprojeto acadêmico (A3)
 
 **E-commerce com autenticação segura, verificação em duas etapas e arquitetura em camadas.**
 
